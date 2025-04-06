@@ -18,25 +18,24 @@ function FuelForm({ onRecordAdded, editRecord, setEditRecord }) {
       const formattedDate = new Date(editRecord.date).toLocaleDateString('en-CA').split('T')[0];// change to YYYY-MM-DD, local time
       setFormData({//Overwriting Properties: licensePlate
         ...editRecord,
-        licensePlate: editRecord.licenseplate,
         date: formattedDate,
         isFull: editRecord.isFull || false // Ensure isFull is set
       });
     }
   }, [editRecord]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (editRecord) {
-      updateFuelRecord(formData);
+      await updateFuelRecord(formData);
       setEditRecord(null);
     } else {
-      saveFuelRecord(formData);
+      await saveFuelRecord(formData);
     }
-    onRecordAdded();
+    await onRecordAdded(); // Trigger a reload of records after submission
     setFormData({
       date: new Date().toISOString().split('T')[0],
-      licensePlate: formData.licensePlate,
+      licensePlate: '',
       amount: '',
       price: '',
       odometer: '',

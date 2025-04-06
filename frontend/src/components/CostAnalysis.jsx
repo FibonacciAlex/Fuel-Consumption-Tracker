@@ -8,46 +8,20 @@ function CostAnalysis({ records }) {
   const costData = useMemo(() => {
     if (!records.length) return [];
 
-    const data = new Map();
-    
-    records.forEach(record => {
-      const date = new Date(record.date);
-      const key = timeFrame === 'month' 
-        ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        : `${date.getFullYear()}`;
+    return records.map((record, index) => {
+      const totalDistance = index > 0 && records[index - 1].vehicleId === record.vehicleId
+        ? record.odometer - records[index - 1].odometer
+        : 0;
 
-      if (!data.has(key)) {
-        data.set(key, { 
-          date: key,
-          totalCost: 0,
-          totalFuel: 0,
-          totalDistance: 0
-        });
-      }
-
-      const current = data.get(key);
-      current.totalCost += parseFloat(record.price);
-      current.totalFuel += parseFloat(record.amount);
-      
-      // Calculate distance only if there's a previous record for the same vehicle
-      const prevRecord = records
-        .filter(r => r.licensePlate === record.licensePlate && new Date(r.date) < date)
-        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-      
-      if (prevRecord) {
-        current.totalDistance += record.odometer - prevRecord.odometer;
-      }
+      return {
+        date: record.date,
+        totalCost: parseFloat(record.price),
+        costPerKm: totalDistance > 0 
+          ? (parseFloat(record.price) / totalDistance).toFixed(2)
+          : 0,
+      };
     });
-
-    return Array.from(data.values())
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .map(item => ({
-        ...item,
-        costPerKm: item.totalDistance > 0 
-          ? (item.totalCost / item.totalDistance).toFixed(2)
-          : 0
-      }));
-  }, [records, timeFrame]);
+  }, [records]);
 
   return (
     <div className="mt-8 bg-white rounded-lg shadow-md p-6">
@@ -68,8 +42,8 @@ function CostAnalysis({ records }) {
           <LineChart data={costData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
-            <YAxis yAxisId="left" />
-            <YAxis yAxisId="right" orientation="right" />
+            <YAxis yAxisId="left" domain={['auto', 'auto']} />
+            <YAxis yAxisId="right" orientation="right" domain={['auto', 'auto']} />
             <Tooltip />
             <Legend />
             <Line

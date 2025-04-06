@@ -30,6 +30,8 @@ function App() {
   const loadRecords = async () => {
     const { start, end } = filters.dateRange; // Use the date range from filters
     const savedRecords = await getFuelRecords(start, end); // Fetch records within the date range
+    // Add a debug log to inspect the fetched records
+    console.log('Fetched records:', savedRecords);
     setRecords(savedRecords || []); // Set the fetched records
   };
 

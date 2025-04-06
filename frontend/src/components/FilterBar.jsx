@@ -16,12 +16,11 @@ function FilterBar({ records, onFilterChange, onSearch }) {
   const [dateRange, setDateRange] = useState(getDefaultDateRange());
   const [selectedPlates, setSelectedPlates] = useState([]);
 
-  const uniquePlates = [...new Set(records.map(record => record.licenseplate))];
+  const uniquePlates = [...new Set(records.map(record => record.licensePlate))];
 
   const handleDateChange = (field, value) => {
     const newDateRange = { ...dateRange, [field]: value };
     setDateRange(newDateRange);
-    applyFilters(newDateRange, selectedPlates);
   };
 
   const handlePlateChange = (plate) => {
@@ -30,29 +29,19 @@ function FilterBar({ records, onFilterChange, onSearch }) {
       : [...selectedPlates, plate];
     
     setSelectedPlates(newSelectedPlates);
-    applyFilters(dateRange, newSelectedPlates);
-  };
-
-  const applyFilters = (dates, plates) => {
-    onFilterChange({
-      dateRange: dates,
-      licensePlates: plates
-    });
   };
 
   const search = () => {
-    // Call the onSearch function with the current filters
+    onFilterChange({
+      dateRange,
+      licensePlates: selectedPlates,
+    });
     onSearch({
       startDate: dateRange.start,
       endDate: dateRange.end,
-      licensePlates: selectedPlates
+      licensePlates: selectedPlates,
     });
   };
-
-  // Apply default filters on component mount
-  // useEffect(() => {
-  //   applyFilters(dateRange, selectedPlates);
-  // }, []);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-6">

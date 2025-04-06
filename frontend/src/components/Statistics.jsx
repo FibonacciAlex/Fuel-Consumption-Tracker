@@ -4,11 +4,11 @@ import { useMemo } from 'react';
 function Statistics({ records }) {
   const statistics = useMemo(() => {
     const vehicleStats = {};
-    debugger
-    // Group records by license plate
+
+    // Group and preprocess records by license plate
     records.forEach(record => {
-      if (!vehicleStats[record.licenseplate]) {
-        vehicleStats[record.licenseplate] = {
+      if (!vehicleStats[record.licensePlate]) {
+        vehicleStats[record.licensePlate] = {
           totalConsumption: 0,
           totalDistance: 0,
           totalFuel: 0,
@@ -16,24 +16,43 @@ function Statistics({ records }) {
           records: []
         };
       }
-      vehicleStats[record.licenseplate].records.push(record);
+      vehicleStats[record.licensePlate].records.push(record);
+    });
+
+    // Sort records by date for each vehicle
+    Object.keys(vehicleStats).forEach(plate => {
+      vehicleStats[plate].records.sort((a, b) => new Date(a.date) - new Date(b.date));
     });
 
     // Calculate statistics for each vehicle
     Object.keys(vehicleStats).forEach(plate => {
-      const sortedRecords = vehicleStats[plate].records.sort((a, b) => 
-        new Date(a.date) - new Date(b.date)
-      );
+      const sortedRecords = vehicleStats[plate].records;
 
       let totalFuel = 0;
       let totalDistance = 0;
       let totalCost = 0;
 
       for (let i = 1; i < sortedRecords.length; i++) {
-        const distance = sortedRecords[i].odometer - sortedRecords[i-1].odometer;
-        totalDistance += distance;
-        totalFuel += parseFloat(sortedRecords[i].amount);
-        totalCost += parseFloat(sortedRecords[i].price);
+        const currentRecord = sortedRecords[i];
+        const previousRecord = sortedRecords[i - 1];
+
+        // Validate odometer values
+        if (
+          typeof currentRecord.odometer === 'number' &&
+          typeof previousRecord.odometer === 'number' &&
+          currentRecord.odometer > previousRecord.odometer
+        ) {
+          const distance = currentRecord.odometer - previousRecord.odometer;
+          totalDistance += distance;
+        }
+
+        // Validate fuel amount and price
+        if (typeof currentRecord.amount === 'number') {
+          totalFuel += parseFloat(currentRecord.amount);
+        }
+        if (typeof currentRecord.price === 'number') {
+          totalCost += parseFloat(currentRecord.price);
+        }
       }
 
       vehicleStats[plate].averageConsumption = totalDistance > 0 

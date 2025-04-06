@@ -9,12 +9,11 @@ function FuelList({ records, onRecordDeleted, onEditRecord }) {
     // Group by license plate
     const groupedRecords = {};
     sortedRecords.forEach(record => {
-      if (!groupedRecords[record.licenseplate]) {
-        groupedRecords[record.licenseplate] = [];
+      if (!groupedRecords[record.licensePlate]) {
+        groupedRecords[record.licensePlate] = [];
       }
-      groupedRecords[record.licenseplate].push(record);
+      groupedRecords[record.licensePlate].push(record);
     });
-    debugger
 
     // Calculate consumption for each group
     const processedRecords = [];
@@ -75,7 +74,7 @@ function FuelList({ records, onRecordDeleted, onEditRecord }) {
         <tbody className="divide-y divide-gray-200">
           {recordsWithConsumption.map((record) => (
             <tr key={record.id}>
-              <td className="px-6 py-4 whitespace-nowrap">{record.licenseplate}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{record.licensePlate}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 {new Date(record.date).toLocaleDateString('en-CA')} {/* Format date as YYYY-MM-DD in local time */}
               </td>
@@ -89,7 +88,7 @@ function FuelList({ records, onRecordDeleted, onEditRecord }) {
                 {record.costPerKm ? record.costPerKm : '-'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {record.filled ? record.filled : 'False'}
+                {record.filled ? 'Yes' : 'No'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <button
