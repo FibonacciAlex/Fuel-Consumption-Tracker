@@ -5,6 +5,7 @@ const createTable = async () => {
   await run(`
     CREATE TABLE IF NOT EXISTS fuel_records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
       date TEXT NOT NULL,
       amount REAL NOT NULL,
       price REAL NOT NULL,
@@ -15,23 +16,26 @@ const createTable = async () => {
   `);
 };
 
-// Insert a new fuel record
-const insertFuelRecord = async (date, fuelAmount, price, plate_number, full, odometer) => {
-  console.log(date, fuelAmount, price, plate_number, full, odometer);
-  
+// Updated insertFuelRecord to include user ID
+const insertFuelRecord = async (userId, date, fuelAmount, price, plate_number, full, odometer) => {
   full = full === true ? 1 : 0; // Convert boolean to 0/1, SQLite uses 0/1 for boolean values
-  
+
   await run(
-    'INSERT INTO fuel_records (date, amount, price, licensePlate, filled, odometer) VALUES (?, ?, ?, ?, ?, ?)',
-    [date, fuelAmount, price, plate_number, full, odometer]
+    'INSERT INTO fuel_records (user_id, date, amount, price, licensePlate, filled, odometer) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [userId, date, fuelAmount, price, plate_number, full, odometer]
   );
 };
 
-// Fetch all fuel records with optional filters
-const getFuelRecords = async (filters = {}) => {
+// Updated getFuelRecords to filter by user ID unless the user is admin
+const getFuelRecords = async (userId, isAdmin, filters = {}) => {
   const { startDate, endDate, licensePlate } = filters;
   let queryText = 'SELECT * FROM fuel_records WHERE 1=1';
   const queryParams = [];
+
+  if (!isAdmin) {
+    queryText += ' AND user_id = ?';
+    queryParams.push(userId);
+  }
 
   if (startDate) {
     queryText += ' AND date >= ?';

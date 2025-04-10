@@ -4,6 +4,7 @@ import FuelList from './components/FuelList';
 import Statistics from './components/Statistics';
 import CostAnalysis from './components/CostAnalysis';
 import FilterBar from './components/FilterBar';
+import LoginButton from './components/LoginButton';
 import { getFuelRecords } from './utils/storage';
 
 function App() {
@@ -74,6 +75,7 @@ function App() {
         <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
           Vehicle Fuel Consumption Tracker
         </h1>
+        <LoginButton />
         <FuelForm 
           onRecordAdded={loadRecords} 
           editRecord={editRecord}
