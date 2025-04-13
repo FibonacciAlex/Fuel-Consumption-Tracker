@@ -14,9 +14,16 @@ const addFuelRecord = async (req, res) => {
 
 // Fetch all fuel records
 const fetchFuelRecords = async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized: Login required' });
+  }
+
   try {
     const { startDate, endDate, licensePlate } = req.query;
-    const records = await getFuelRecords({ startDate, endDate, licensePlate });
+    const userId = req.user.id;
+    const isAdmin = req.user.is_admin;
+
+    const records = await getFuelRecords(userId, isAdmin, { startDate, endDate, licensePlate });
     res.status(200).json(records);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -3,7 +3,12 @@ const API_URL = 'http://localhost:5000/api/fuel-records';
 
 export const getFuelRecords = async (startDate, endDate) => {
   try {
-    const response = await fetch(`${API_URL}?startDate=${startDate}&endDate=${endDate}`);
+    const response = await fetch(`${API_URL}?startDate=${startDate}&endDate=${endDate}`, {
+      credentials: 'include', // Include cookies for authentication
+    });
+    if (response.status === 401) {
+      throw new Error('Unauthorized: Please log in to view records');
+    }
     if (!response.ok) {
       throw new Error('Failed to fetch fuel records');
     }

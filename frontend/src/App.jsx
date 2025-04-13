@@ -10,60 +10,69 @@ import { getFuelRecords } from './utils/storage';
 function App() {
   const [records, setRecords] = useState([]);
   const [editRecord, setEditRecord] = useState(null);
+  const [user, setUser] = useState(null); // Track logged-in user
 
-  // Set the default date range to the last 7 days in YYYY-MM-DD format
+  useEffect(() => {
+    // Fetch user info from the backend
+    fetch('http://localhost:5000/auth/user', {
+      credentials: 'include',
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Unauthorized');
+      })
+      .then((data) => setUser(data.user))
+      .catch(() => setUser(null));
+  }, []);
+
   const getDefaultDateRange = () => {
     const today = new Date();
     const lastWeek = new Date();
     lastWeek.setDate(today.getDate() - 7);
     return {
-      start: lastWeek.toISOString().split('T')[0], // Format as YYYY-MM-DD
-      end: today.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      start: lastWeek.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0],
     };
   };
 
   const [filters, setFilters] = useState({
-    dateRange: getDefaultDateRange(), // Default to the last 7 days
+    dateRange: getDefaultDateRange(),
     licensePlates: [],
   });
 
-  // Load records using the default time period or filters
   const loadRecords = async () => {
-    const { start, end } = filters.dateRange; // Use the date range from filters
-    const savedRecords = await getFuelRecords(start, end); // Fetch records within the date range
-    // Add a debug log to inspect the fetched records
-    console.log('Fetched records:', savedRecords);
-    setRecords(savedRecords || []); // Set the fetched records
+    if (!user) return; // Do not load records if user is not logged in
+
+    const { start, end } = filters.dateRange;
+    const savedRecords = await getFuelRecords(start, end);
+    setRecords(savedRecords || []);
   };
 
-  // Trigger loading records when filters change
   useEffect(() => {
     loadRecords();
-  }, [filters]);
+  }, [filters, user]);
 
-  // Handle search triggered by the FilterBar
   const handleSearch = ({ startDate, endDate, licensePlates }) => {
     setFilters({
       dateRange: { start: startDate, end: endDate },
-      licensePlates,
+      licensePlates: licensePlates || [], // Ensure licensePlates is an array
     });
   };
 
   const filteredRecords = useMemo(() => {
-    return (records || []).filter(record => {
+    return (records || []).filter((record) => {
       const date = new Date(record.date);
       const startDate = filters.dateRange.start ? new Date(filters.dateRange.start) : null;
       const endDate = filters.dateRange.end ? new Date(filters.dateRange.end) : null;
 
-      const meetsDateRange = (
-        (!startDate || date >= startDate) &&
-        (!endDate || date <= endDate)
-      );
+      const meetsDateRange =
+        (!startDate || date >= startDate) && (!endDate || date <= endDate);
 
-      const meetsPlateFilter = (
+      const meetsPlateFilter =
         filters.licensePlates.length === 0 ||
-        filters.licensePlates.includes(record.licensePlate)
-      );
+        filters.licensePlates.includes(record.licensePlate);
 
       return meetsDateRange && meetsPlateFilter;
     });
@@ -76,23 +85,29 @@ function App() {
           Vehicle Fuel Consumption Tracker
         </h1>
         <LoginButton />
-        <FuelForm 
-          onRecordAdded={loadRecords} 
-          editRecord={editRecord}
-          setEditRecord={setEditRecord}
-        />
-        <FilterBar 
-          records={records}
-          onFilterChange={setFilters}
-          onSearch={handleSearch} // Pass the search handler
-        />
-        <CostAnalysis records={filteredRecords} />
-        <Statistics records={filteredRecords} />
-        <FuelList 
-          records={filteredRecords} 
-          onRecordDeleted={loadRecords}
-          onEditRecord={setEditRecord}
-        />
+        {user ? (
+          <>
+            <FuelForm 
+              onRecordAdded={loadRecords} 
+              editRecord={editRecord}
+              setEditRecord={setEditRecord}
+            />
+            <FilterBar 
+              records={records}
+              onFilterChange={setFilters}
+              onSearch={handleSearch}
+            />
+            <CostAnalysis records={filteredRecords} />
+            <Statistics records={filteredRecords} />
+            <FuelList 
+              records={filteredRecords} 
+              onRecordDeleted={loadRecords}
+              onEditRecord={setEditRecord}
+            />
+          </>
+        ) : (
+          <p className="text-center text-gray-700">Please log in to view your fuel records.</p>
+        )}
       </div>
     </div>
   );
