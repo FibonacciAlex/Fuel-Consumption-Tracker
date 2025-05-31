@@ -20,7 +20,7 @@ const PORT = 5000;
 
 // Enable CORS for all origins
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow only this origin frontend
+  origin: process.env.ALLOW_ORIGIN, // Allow only this origin frontend
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 }));
 

@@ -39,6 +39,9 @@ A modern React template for web applications and games, featuring React 18, Vite
 - Javascript
 
 ## Run the Project
-1. cd /fuel-consumption-record/frontend
+1. cd /Fuel-Consumption-Tracker/frontend
 2. npm install
 3. npm run dev
+
+
+## How to Deploy
