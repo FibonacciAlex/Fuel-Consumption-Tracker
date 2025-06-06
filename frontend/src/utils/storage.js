@@ -1,5 +1,5 @@
 // storage.js
-const API_URL = 'http://localhost:5000/api/fuel-records';
+const API_URL = '/api/fuel-records';
 
 export const getFuelRecords = async (startDate, endDate) => {
   try {

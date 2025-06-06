@@ -38,10 +38,16 @@ A modern React template for web applications and games, featuring React 18, Vite
 - ESLint
 - Javascript
 
-## Run the Project
+## Run the Project in dev env
+### Frontend
 1. cd /Fuel-Consumption-Tracker/frontend
 2. npm install
 3. npm run dev
+
+### Backend
+1. Go to Google Auth Platform and  create an OAuth 2.0 Client ID.
+2. Create .env file in project backend root folder, and then configure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SECRET_KEY (These three variables are from Google Aouth Client secret key) and ALLOW_ORIGIN.
+3. Run the app
 
 
 ## How to Deploy
