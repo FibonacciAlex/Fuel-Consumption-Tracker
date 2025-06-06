@@ -52,3 +52,27 @@ A modern React template for web applications and games, featuring React 18, Vite
 
 ## How to Deploy
 1. Make sure your server has installed nodejs&npm.
+```
+# These commands are for ubuntu
+sudo apt remove nodejs npm -y
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+source ~/.bashrc
+nvm install 22
+node -v
+npm -v
+```
+2. Compile frontend
+```
+cd frontend
+npm install
+npm run build
+```
+3. Install package for backend
+```
+
+npm install express body-parser cors passport passport-google-oauth20 express-session dotenv
+```
+5. Run the application
+```
+nohup node src/app.js > output.log 2>&1 &
+```
