@@ -51,3 +51,4 @@ A modern React template for web applications and games, featuring React 18, Vite
 
 
 ## How to Deploy
+1. Make sure your server has installed nodejs&npm.
