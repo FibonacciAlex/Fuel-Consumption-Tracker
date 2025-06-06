@@ -87,7 +87,7 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     // Successful authentication, redirect to frontend or dashboard
-    res.redirect('http://localhost:5173');
+    res.redirect(ALLOW_ORIGIN);
   });
 
 // Initialize Database

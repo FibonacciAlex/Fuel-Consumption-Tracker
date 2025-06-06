@@ -14,7 +14,7 @@ function App() {
 
   useEffect(() => {
     // Fetch user info from the backend
-    fetch('http://localhost:5000/auth/user', {
+    fetch(`${backendUrl}/auth/user`, {
       credentials: 'include',
     })
       .then((response) => {

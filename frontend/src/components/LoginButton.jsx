@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 
+
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
 const LoginButton = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     // Fetch user info from the backend
-    fetch('http://localhost:5000/auth/user', {
+    fetch(`${backendUrl}/auth/user`, {
       credentials: 'include',
     })
       .then((response) => response.json())
@@ -14,11 +17,11 @@ const LoginButton = () => {
   }, []);
 
   const handleLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/google';
+    window.location.href = `${backendUrl}/auth/google`;
   };
 
   const handleLogout = () => {
-    fetch('http://localhost:5000/auth/logout', {
+    fetch(`${backendUrl}/auth/logout`, {
       method: 'POST',
       credentials: 'include',
     })
