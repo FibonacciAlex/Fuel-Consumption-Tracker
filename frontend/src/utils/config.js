@@ -1,0 +1,2 @@
+export const backendUrl = import.meta.env.VITE_BACKEND_URL || '';// We use vite to build the frontend, so we can use environment variables
+// Make sure to set VITE_BACKEND_URL in your .env file or in the Vite config

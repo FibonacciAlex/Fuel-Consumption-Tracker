@@ -6,6 +6,7 @@ import CostAnalysis from './components/CostAnalysis';
 import FilterBar from './components/FilterBar';
 import LoginButton from './components/LoginButton';
 import { getFuelRecords } from './utils/storage';
+import { backendUrl } from './utils/config';
 
 function App() {
   const [records, setRecords] = useState([]);

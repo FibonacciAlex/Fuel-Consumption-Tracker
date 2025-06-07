@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-
-
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+import { backendUrl } from '../utils/config';
 
 const LoginButton = () => {
   const [user, setUser] = useState(null);

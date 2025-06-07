@@ -8,7 +8,7 @@ const session = require('express-session'); // Import the session middleware
 // Load environment variables from .env file
 // This is important for security, do not expose your credentials in the code
 // Make sure to create a .env file in the root of your project 
-require("dotenv").config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 const { createTable } = require('./models/recordModel');
 const { getUserByGoogleId, createUser,  createUsersTable} = require('./models/userModel');

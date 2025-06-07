@@ -6,3 +6,4 @@
 */*/.env
 .vscode
 */.dist
+backend/.env
