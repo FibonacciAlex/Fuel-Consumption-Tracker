@@ -26,11 +26,19 @@ function FuelForm({ onRecordAdded, editRecord, setEditRecord }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Map isFull to boolean and ensure all fields are correct
+    const recordToSend = {
+      ...formData,
+      isFull: formData.isFull === true || formData.isFull === 'true',
+      amount: parseFloat(formData.amount),
+      price: parseFloat(formData.price),
+      odometer: parseFloat(formData.odometer),
+    };
     if (editRecord) {
-      await updateFuelRecord(formData);
+      await updateFuelRecord({ ...recordToSend, id: editRecord.id });
       setEditRecord(null);
     } else {
-      await saveFuelRecord(formData);
+      await saveFuelRecord(recordToSend);
     }
     await onRecordAdded(); // Trigger a reload of records after submission
     setFormData({

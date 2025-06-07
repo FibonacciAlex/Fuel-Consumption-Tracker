@@ -19,7 +19,9 @@ const createTable = async () => {
 // Updated insertFuelRecord to include user ID
 const insertFuelRecord = async (userId, date, fuelAmount, price, plate_number, full, odometer) => {
   full = full === true ? 1 : 0; // Convert boolean to 0/1, SQLite uses 0/1 for boolean values
-
+  console.log('Inserting fuel record:', {
+    userId, date, fuelAmount, price, plate_number, full, odometer
+  });
   await run(
     'INSERT INTO fuel_records (user_id, date, amount, price, licensePlate, filled, odometer) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [userId, date, fuelAmount, price, plate_number, full, odometer]
@@ -29,6 +31,9 @@ const insertFuelRecord = async (userId, date, fuelAmount, price, plate_number, f
 // Updated getFuelRecords to filter by user ID unless the user is admin
 const getFuelRecords = async (userId, isAdmin, filters = {}) => {
   const { startDate, endDate, licensePlate } = filters;
+
+  console.log('Fetching fuel records for user:', userId, 'Admin:', isAdmin, 'Filters:', filters);
+
   let queryText = 'SELECT * FROM fuel_records WHERE 1=1';
   const queryParams = [];
 
@@ -60,6 +65,10 @@ const updateFuelRecord = async (id, date, fuelAmount, price, plate_number, full,
   if (typeof date === 'string') {
     date = new Date(date).toISOString().split('T')[0];
   }
+  console.log('Updating fuel record:', {
+    id, date, fuelAmount, price, plate_number, full, odometer
+  });
+
   await run(
     'UPDATE fuel_records SET date = ?, amount = ?, price = ?, licensePlate = ?, filled = ?, odometer = ? WHERE id = ?',
     [date, fuelAmount, price, plate_number, full, odometer, id]

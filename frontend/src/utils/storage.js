@@ -1,9 +1,13 @@
 // storage.js
-const API_URL = '/api/fuel-records';
+import { backendUrl } from './config';
+
+const API_URL = `${backendUrl}/api/fuel-records`;
 
 export const getFuelRecords = async (startDate, endDate) => {
   try {
-    const response = await fetch(`${API_URL}?startDate=${startDate}&endDate=${endDate}`, {
+    const url = `${API_URL}?startDate=${startDate}&endDate=${endDate}`;
+    console.log(`Fetching fuel records from: ${url}`);
+    const response = await fetch(url, {
       credentials: 'include', // Include cookies for authentication
     });
     if (response.status === 401) {
@@ -25,6 +29,7 @@ export const saveFuelRecord = async (record) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(record),
+      credentials: 'include', // Always include credentials
     });
     if (!response.ok) {
       throw new Error('Failed to save fuel record');
@@ -41,6 +46,7 @@ export const updateFuelRecord = async (updatedRecord) => {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedRecord),
+      credentials: 'include', // Always include credentials
     });
     if (!response.ok) {
       throw new Error('Failed to update fuel record');
@@ -55,6 +61,7 @@ export const deleteFuelRecord = async (id) => {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',
+      credentials: 'include', // Always include credentials
     });
     if (!response.ok) {
       throw new Error('Failed to delete fuel record');
