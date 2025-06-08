@@ -6,8 +6,8 @@ const addFuelRecord = async (req, res) => {
     return res.status(401).json({ error: 'Unauthorized: Login required' });
   }
   const { date, amount, price, licensePlate, isFull, odometer } = req.body;
-  // Map isFull to filled for DB
-  const filled = isFull === true || isFull === 'true';
+  // Map isFull to filled for DB (ensure number)
+  const filled = (isFull === true || isFull === 'true') ? 1 : 0;
   console.log('Adding fuel record:', { date, amount, price, licensePlate, isFull, odometer });
   try {
     await insertFuelRecord(
@@ -52,8 +52,8 @@ const updateFuelRecordById = async (req, res) => {
   }
   const { id } = req.params;
   const { date, amount, price, licensePlate, isFull, odometer } = req.body;
-  // Map isFull to filled for DB
-  const filled = isFull === true || isFull === 'true';
+  // Map isFull to filled for DB (ensure number)
+  const filled = (isFull === true || isFull === 'true') ? 1 : 0;
   try {
     console.log('Updating fuel record:', { id, date, amount, price, licensePlate, isFull, odometer });
     if (!id || !date || amount === undefined || price === undefined || !licensePlate || odometer === undefined) {

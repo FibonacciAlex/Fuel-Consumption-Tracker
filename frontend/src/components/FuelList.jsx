@@ -4,9 +4,8 @@ import { deleteFuelRecord } from '../utils/storage';
 
 function FuelList({ records, onRecordDeleted, onEditRecord }) {
   const recordsWithConsumption = useMemo(() => {
-    const sortedRecords = records.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    // Group by license plate
+    // Sort and group by license plate
+    const sortedRecords = [...records].sort((a, b) => new Date(a.date) - new Date(b.date));
     const groupedRecords = {};
     sortedRecords.forEach(record => {
       if (!groupedRecords[record.licensePlate]) {
@@ -14,29 +13,29 @@ function FuelList({ records, onRecordDeleted, onEditRecord }) {
       }
       groupedRecords[record.licensePlate].push(record);
     });
-
-    // Calculate consumption for each group
+    // Calculate only for full-to-full intervals
     const processedRecords = [];
     Object.values(groupedRecords).forEach(plateRecords => {
+      let prev = null;
       plateRecords.forEach((record, index) => {
-        if (index === 0) {
-          processedRecords.push({ ...record, consumption: null, costPerKm: null });
-          return;
+        let consumption = null;
+        let costPerKm = null;
+        // Only calculate if current record is full and there is a previous record
+        if (prev && record.filled) {
+          const distance = record.odometer - prev.odometer;
+          if (distance > 0 && record.amount > 0) {
+            consumption = ((record.amount / distance) * 100).toFixed(2);
+            costPerKm = (record.price / distance).toFixed(2);
+          }
         }
-        
-        const prevRecord = plateRecords[index - 1];
-        const distance = record.odometer - prevRecord.odometer;
-        const consumption = (record.amount / distance) * 100; // L/100km
-        const costPerKm = record.price / distance; // $/km
-        
         processedRecords.push({
           ...record,
-          consumption: consumption.toFixed(2),
-          costPerKm: costPerKm.toFixed(2)
+          consumption,
+          costPerKm
         });
+        prev = record;
       });
     });
-
     return processedRecords;
   }, [records]);
 

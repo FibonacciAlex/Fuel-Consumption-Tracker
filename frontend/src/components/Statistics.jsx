@@ -27,39 +27,34 @@ function Statistics({ records }) {
     // Calculate statistics for each vehicle
     Object.keys(vehicleStats).forEach(plate => {
       const sortedRecords = vehicleStats[plate].records;
-
       let totalFuel = 0;
       let totalDistance = 0;
       let totalCost = 0;
-
-      for (let i = 1; i < sortedRecords.length; i++) {
-        const currentRecord = sortedRecords[i];
-        const previousRecord = sortedRecords[i - 1];
-
-        // Validate odometer values
-        if (
-          typeof currentRecord.odometer === 'number' &&
-          typeof previousRecord.odometer === 'number' &&
-          currentRecord.odometer > previousRecord.odometer
-        ) {
-          const distance = currentRecord.odometer - previousRecord.odometer;
-          totalDistance += distance;
+      
+      let smallOdometer = 0;
+      let maxOdometer = 0;
+      let curr = null;
+      for (let i = 0; i < sortedRecords.length; i++) {
+        curr = sortedRecords[i];
+        if(smallOdometer > curr.odometer) {
+          smallOdometer = curr.odometer;
+        }
+        if(maxOdometer < curr.odometer) { 
+          maxOdometer = curr.odometer;
         }
 
-        // Validate fuel amount and price
-        if (typeof currentRecord.amount === 'number') {
-          totalFuel += parseFloat(currentRecord.amount);
-        }
-        if (typeof currentRecord.price === 'number') {
-          totalCost += parseFloat(currentRecord.price);
-        }
+        totalFuel += curr.amount;
+        totalCost += curr.price;
+
       }
 
+      totalDistance = maxOdometer - smallOdometer;
+      
       vehicleStats[plate].averageConsumption = totalDistance > 0 
-        ? ((totalFuel / totalDistance) * 100).toFixed(2)
+        ? (((totalFuel-curr.amount) / totalDistance) * 100).toFixed(2)
         : null;
-      vehicleStats[plate].averageCostPerKm = totalDistance > 0
-        ? (totalCost / totalDistance).toFixed(2)
+      vehicleStats[plate].averageCostPer100km = totalDistance > 0
+        ? (((totalFuel-curr.amount) / totalDistance) * 100).toFixed(2)
         : null;
       vehicleStats[plate].totalDistance = totalDistance;
       vehicleStats[plate].totalFuel = totalFuel;
@@ -81,7 +76,7 @@ function Statistics({ records }) {
                 Average Consumption: {stats.averageConsumption ? `${stats.averageConsumption} L/100km` : 'N/A'}
               </p>
               <p className="text-gray-600">
-                Average Cost: {stats.averageCostPerKm ? `$${stats.averageCostPerKm}/km` : 'N/A'}
+                Average Cost: {stats.averageCostPer100km ? `$${stats.averageCostPer100km}/100km` : 'N/A'}
               </p>
               <p className="text-gray-600">
                 Total Distance: {stats.totalDistance.toFixed(1)} km
