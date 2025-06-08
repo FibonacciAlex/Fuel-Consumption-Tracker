@@ -9,7 +9,7 @@ async function getUserByGoogleId(googleId) {
 
 // Function to create a new user
 async function createUser(user) {
-  console.log('Creating user:', user);
+  console.log('Creating user:', user.name);
   const query = 'INSERT INTO users (google_id, name, email) VALUES (?, ?, ?)';
   const result = await run(query, [user.googleId, user.name, user.email]); // Remove destructuring
   return { id: result.lastInsertRowid, ...user }; // Use result.lastInsertRowid for the inserted ID
