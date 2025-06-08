@@ -8,7 +8,8 @@ const addFuelRecord = async (req, res) => {
   const { date, amount, price, licensePlate, isFull, odometer } = req.body;
   // Map isFull to filled for DB (ensure number)
   const filled = (isFull === true || isFull === 'true') ? 1 : 0;
-  console.log('Adding fuel record:', { date, amount, price, licensePlate, isFull, odometer });
+
+  console.log('Adding fuel record, date:', data,', amount:', amount,', price:',price,', licensePlate:',licensePlate,', isFull:',filled,', odometer:', odometer });
   try {
     await insertFuelRecord(
       req.user.id,

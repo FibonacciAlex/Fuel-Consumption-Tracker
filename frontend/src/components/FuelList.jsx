@@ -13,29 +13,80 @@ function FuelList({ records, onRecordDeleted, onEditRecord }) {
       }
       groupedRecords[record.licensePlate].push(record);
     });
-    // Calculate only for full-to-full intervals
+    // Calculate consumption and cost per km for full-to-full intervals
     const processedRecords = [];
     Object.values(groupedRecords).forEach(plateRecords => {
-      let prev = null;
+      // First, identify all calculation intervals
+      const intervals = [];
+      
+      for (let i = 0; i < plateRecords.length - 1; i++) {
+        // Assume first and final record is full tank for calculation convenience
+        const isCurrentEffectivelyFull = i === 0 || plateRecords[i].filled || i === (plateRecords.length - 1);
+        
+        if (isCurrentEffectivelyFull) {
+          // Find the next full tank record and accumulate partial fills
+          let nextFullIndex = -1;
+          let totalAmount = 0;
+          let totalPrice = 0;
+          
+          // Look for the next full tank record
+          for (let j = i + 1; j < plateRecords.length; j++) {
+            totalAmount += plateRecords[i].amount;
+            totalPrice += plateRecords[i].price;
+            if (plateRecords[j].filled || j === (plateRecords.length - 1)) {
+              nextFullIndex = j;
+              break;
+            }
+            
+            
+            
+          }
+          
+          // Calculate consumption and cost per km if we found a next full tank
+          if (nextFullIndex !== -1) {
+            const distance = plateRecords[nextFullIndex].odometer - plateRecords[i].odometer;
+            if (distance > 0 && totalAmount > 0) {
+              const consumption = ((totalAmount / distance) * 100).toFixed(2);
+              const costPerKm = (totalPrice / distance).toFixed(2);
+              
+              // Store interval data
+              intervals.push({
+                startIndex: i,
+                endIndex: nextFullIndex,
+                consumption,
+                costPerKm
+              });
+            }
+          }
+        }
+      }
+      
+      // Now assign values to records based on intervals
       plateRecords.forEach((record, index) => {
         let consumption = null;
         let costPerKm = null;
-        // Only calculate if current record is full and there is a previous record
-        if (prev && record.filled) {
-          const distance = record.odometer - prev.odometer;
-          if (distance > 0 && record.amount > 0) {
-            consumption = ((record.amount / distance) * 100).toFixed(2);
-            costPerKm = (record.price / distance).toFixed(2);
+        
+        // Skip calculation for the last record (it's for future use)
+        if (index < plateRecords.length - 1) {
+          // Find if this record is part of any interval
+          const interval = intervals.find(int => 
+            index >= int.startIndex && index < int.endIndex
+          );
+          
+          if (interval) {
+            consumption = interval.consumption;
+            costPerKm = interval.costPerKm;
           }
         }
+        
         processedRecords.push({
           ...record,
           consumption,
           costPerKm
         });
-        prev = record;
       });
     });
+
     return processedRecords;
   }, [records]);
 

@@ -32,7 +32,6 @@ const insertFuelRecord = async (userId, date, fuelAmount, price, plate_number, f
 const getFuelRecords = async (userId, isAdmin, filters = {}) => {
   const { startDate, endDate, licensePlate } = filters;
 
-  console.log('Fetching fuel records for user:', userId, 'Admin:', isAdmin, 'Filters:', filters);
 
   let queryText = 'SELECT * FROM fuel_records WHERE 1=1';
   const queryParams = [];

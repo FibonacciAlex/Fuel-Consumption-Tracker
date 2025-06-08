@@ -31,7 +31,7 @@ function Statistics({ records }) {
       let totalDistance = 0;
       let totalCost = 0;
       
-      let smallOdometer = 0;
+      let smallOdometer = sortedRecords[0].odometer;
       let maxOdometer = 0;
       let curr = null;
       for (let i = 0; i < sortedRecords.length; i++) {
@@ -54,7 +54,7 @@ function Statistics({ records }) {
         ? (((totalFuel-curr.amount) / totalDistance) * 100).toFixed(2)
         : null;
       vehicleStats[plate].averageCostPer100km = totalDistance > 0
-        ? (((totalFuel-curr.amount) / totalDistance) * 100).toFixed(2)
+        ? (((totalCost-curr.price) / totalDistance) * 100).toFixed(2)
         : null;
       vehicleStats[plate].totalDistance = totalDistance;
       vehicleStats[plate].totalFuel = totalFuel;
