@@ -27,9 +27,9 @@ You can see the demo here: https://www.skygroud.com
 - Only modify `vite.config.js` if absolutely necessary
 
 ## Available Scripts
-- `pnpm install` - Install dependencies
-- `pnpm run dev` - Start development server
-- `pnpm run lint` - Lint source files
+- `npm install` - Install dependencies
+- `npm run dev` - Start development server
+- `npm run build` - Lint source files
 
 ## Tech Stack
 
