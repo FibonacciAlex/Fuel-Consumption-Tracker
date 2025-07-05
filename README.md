@@ -1,7 +1,7 @@
 # React + Vite Template
 
 A modern React template for web applications and games, featuring React 18, Vite, TailwindCSS, and Material UI.
-You can see the demo here: [https://www.skygroud.com](https://skygroud.com/fuel-consumption-tracker/)
+You can see the demo here: https://skygroud.com/fuel-consumption-tracker/
 
 ## Project Structure
 
