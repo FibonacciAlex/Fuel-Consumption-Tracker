@@ -12,6 +12,15 @@ function App() {
   const [records, setRecords] = useState([]);
   const [editRecord, setEditRecord] = useState(null);
   const [user, setUser] = useState(null); // Track logged-in user
+  const [authError, setAuthError] = useState(false);
+
+  useEffect(() => {
+    // check URL to see if there is an authentication error
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error') === 'auth_failed') {
+      setAuthError(true);
+    }
+  }, []);
 
   useEffect(() => {
     // Fetch user info from the backend
@@ -107,7 +116,12 @@ function App() {
             />
           </>
         ) : (
-          <p className="text-center text-gray-700">Please log in to view your fuel records.</p>
+          <>
+            {authError && (
+              <p className="text-center text-red-600 mb-2">Google authentication fail，please try again later</p>
+            )}
+            <p className="text-center text-gray-700">Please log in to view your fuel records.</p>
+          </>
         )}
       </div>
     </div>

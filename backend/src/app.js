@@ -38,7 +38,7 @@ app.use(session({
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/auth/google/callback',
+  callbackURL: (process.env.ALLOW_ORIGIN ? process.env.ALLOW_ORIGIN.replace(/\/$/, '') : '') + '/auth/google/callback',
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     // Check if user exists in the database
@@ -84,9 +84,10 @@ app.get('/auth/google', passport.authenticate('google', {
 }));
 
 app.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/' }),
+  passport.authenticate('google', { failureRedirect: process.env.ALLOW_ORIGIN + '/login?error=auth_failed' }),
   (req, res) => {
     // Successful authentication, redirect to frontend or dashboard
+    console.log(`Google redirect is:${process.env.ALLOW_ORIGIN}`);
     res.redirect(process.env.ALLOW_ORIGIN);
   });
 
