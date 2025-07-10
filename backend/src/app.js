@@ -38,7 +38,7 @@ app.use(session({
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: (process.env.ALLOW_ORIGIN ? process.env.ALLOW_ORIGIN.replace(/\/$/, '') : '') + '/auth/google/callback',
+  callbackURL: process.env.callback_URL, // Use the callback URL from .env
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     // Check if user exists in the database
