@@ -7,3 +7,5 @@
 .vscode
 */.dist
 backend/.env
+*/bin
+*/obj

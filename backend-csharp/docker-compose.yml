@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  fuel-tracker-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+    volumes:
+      - ./appsettings.json:/app/appsettings.json:ro
+      - fuel-tracker-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  fuel-tracker-data: 
