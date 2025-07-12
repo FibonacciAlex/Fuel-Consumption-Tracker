@@ -12,3 +12,7 @@ backend/.env
 */build
 */obj
 /appsettings.json
+backend-csharp/appsettings.json
+frontend/vite.config.js
+backend-csharp/.github/copilot-instructions.md
+backend/.env
