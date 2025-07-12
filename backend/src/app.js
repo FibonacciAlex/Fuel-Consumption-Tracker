@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors'); // Import the cors middleware
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const session = require('express-session'); // Import the session middleware
 
 // Load environment variables from .env file
 // This is important for security, do not expose your credentials in the code
@@ -12,6 +11,7 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }
 
 const { createTable } = require('./models/recordModel');
 const { getUserByGoogleId, createUser,  createUsersTable} = require('./models/userModel');
+const jwtService = require('./services/jwtService');
 
 const userRoute = require('./routes/userRoute');
 
@@ -22,17 +22,12 @@ const PORT = 5000;
 app.use(cors({
   origin: process.env.ALLOW_ORIGIN, // Allow only this origin frontend
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow OPTIONS method
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow Authorization header
 }));
 
 // Middleware
 app.use(bodyParser.json());
-
-// Add session middleware
-app.use(session({
-  secret: process.env.SECRET_KEY,
-  resave: false,
-  saveUninitialized: true,
-}));
 
 // Configure Passport.js
 passport.use(new GoogleStrategy({
@@ -59,17 +54,8 @@ passport.use(new GoogleStrategy({
   }
 }));
 
-// Serialize and deserialize user
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-passport.deserializeUser((user, done) => {
-  done(null, user);
-});
-
 // Middleware for Passport.js
 app.use(passport.initialize());
-app.use(passport.session());
 
 // Routes
 const recordRoutes = require('./routes/recordRoute');
@@ -78,17 +64,28 @@ app.use('/api', recordRoutes);
 // Add user routes
 app.use('/auth', userRoute);
 
+// Test route to verify requests are reaching the backend
+app.get('/test', (req, res) => {
+  console.log('Test route hit - Headers:', req.headers);
+  res.json({ message: 'Backend is working', headers: req.headers });
+});
+
 // Google Auth Routes
 app.get('/auth/google', passport.authenticate('google', {
   scope: ['profile', 'email'],
+  session: false, // Disable session, use JWT-based authentication flow.
 }));
 
 app.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: process.env.ALLOW_ORIGIN + '/login?error=auth_failed' }),
+  passport.authenticate('google', { failureRedirect: process.env.ALLOW_ORIGIN + '/login?error=auth_failed', session: false }), // Disable session
   (req, res) => {
-    // Successful authentication, redirect to frontend or dashboard
-    console.log(`Google redirect is:${process.env.ALLOW_ORIGIN}`);
-    res.redirect(process.env.ALLOW_ORIGIN);
+    // Generate JWT token after successful authentication
+    const token = jwtService.generateToken(req.user);
+    
+    // Redirect to frontend with token as query parameter
+    const redirectUrl = `${process.env.ALLOW_ORIGIN}?token=${encodeURIComponent(token)}`;
+    console.log(`Google redirect is:${redirectUrl}`);
+    res.redirect(redirectUrl);
   });
 
 // Initialize Database
@@ -99,7 +96,7 @@ createTable().then(() => {
 createUsersTable().then(() => {
   console.log('Users table initialized');
 });
-
+console.log(`Google callback URL:${process.env.callback_URL}`);
 // Start Server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

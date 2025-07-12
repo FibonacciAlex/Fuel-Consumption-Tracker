@@ -2,11 +2,7 @@ const { insertFuelRecord, getFuelRecords, updateFuelRecord, deleteFuelRecord } =
 
 // Add a new fuel record
 const addFuelRecord = async (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ error: 'Unauthorized: Login required' });
-  }
   const { date, amount, price, licensePlate, isFull, odometer } = req.body;
-
 
   console.log('Adding fuel record, date:', date,', amount:', amount,', price:',price,', licensePlate:',licensePlate,', isFull:',isFull,', odometer:', odometer);
   try {
@@ -28,15 +24,10 @@ const addFuelRecord = async (req, res) => {
 
 // Fetch all fuel records
 const fetchFuelRecords = async (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ error: 'Unauthorized: Login required' });
-  }
-
   try {
-
     const { startDate, endDate, licensePlate } = req.query;
     const userId = req.user.id;
-    const isAdmin = req.user.is_admin;
+    const isAdmin = req.user.isAdmin;
     console.log('Fetching fuel records for user:', userId, 'Admin:', isAdmin, 'Date Range:', startDate, endDate, 'License Plate:', licensePlate);
     const records = await getFuelRecords(userId, isAdmin, { startDate, endDate, licensePlate });
     res.status(200).json(records);

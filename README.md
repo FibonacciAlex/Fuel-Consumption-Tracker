@@ -48,7 +48,7 @@ You can see the demo here: https://skygroud.com/fuel-consumption-tracker/
 ### Backend
 1. Go to Google Auth Platform and  create an OAuth 2.0 Client ID.
 2. Create .env file in project backend root folder, and then configure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SECRET_KEY (These three variables are from Google Aouth Client secret key) and ALLOW_ORIGIN.
-3. Run the app  
+3. Run the app by using VS code
 
 
 ## How to Deploy
@@ -71,7 +71,7 @@ npm run build
 3. Install package for backend
 ```
 
-npm install express body-parser cors passport passport-google-oauth20 express-session dotenv
+npm install express body-parser cors passport passport-google-oauth20 jsonwebtoken dotenv
 ```
 5. Run the application
 ```

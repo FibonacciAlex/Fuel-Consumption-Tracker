@@ -6,13 +6,18 @@ import CostAnalysis from './components/CostAnalysis';
 import FilterBar from './components/FilterBar';
 import LoginButton from './components/LoginButton';
 import { getFuelRecords } from './utils/storage';
-import { backendUrl } from './utils/config';
+import { useAuth } from './hooks/useAuth';
 
 function App() {
   const [records, setRecords] = useState([]);
   const [editRecord, setEditRecord] = useState(null);
-  const [user, setUser] = useState(null); // Track logged-in user
+  const [filters, setFilters] = useState({
+    dateRange: getDefaultDateRange(),
+    licensePlates: [],
+  });
   const [authError, setAuthError] = useState(false);
+
+  const { user, loading, error, login, logout, fetchUser } = useAuth();
 
   useEffect(() => {
     // check URL to see if there is an authentication error
@@ -22,22 +27,7 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    // Fetch user info from the backend
-    fetch(`${backendUrl}/auth/user`, {
-      credentials: 'include',
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error('Unauthorized');
-      })
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null));
-  }, []);
-
-  const getDefaultDateRange = () => {
+  function getDefaultDateRange() {
     const today = new Date();
     const lastWeek = new Date();
     lastWeek.setDate(today.getDate() - 7);
@@ -45,16 +35,10 @@ function App() {
       start: lastWeek.toISOString().split('T')[0],
       end: today.toISOString().split('T')[0],
     };
-  };
-
-  const [filters, setFilters] = useState({
-    dateRange: getDefaultDateRange(),
-    licensePlates: [],
-  });
+  }
 
   const loadRecords = async () => {
     if (!user) return; // Do not load records if user is not logged in
-
     const { start, end } = filters.dateRange;
     const savedRecords = await getFuelRecords(start, end);
     setRecords(savedRecords || []);
@@ -76,14 +60,11 @@ function App() {
       const date = new Date(record.date);
       const startDate = filters.dateRange.start ? new Date(filters.dateRange.start) : null;
       const endDate = filters.dateRange.end ? new Date(filters.dateRange.end) : null;
-
       const meetsDateRange =
         (!startDate || date >= startDate) && (!endDate || date <= endDate);
-
       const meetsPlateFilter =
         filters.licensePlates.length === 0 ||
         filters.licensePlates.includes(record.licensePlate);
-
       return meetsDateRange && meetsPlateFilter;
     });
   }, [records, filters]);
@@ -94,8 +75,31 @@ function App() {
         <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
           Vehicle Fuel Consumption Tracker
         </h1>
-        <LoginButton />
-        {user ? (
+        <LoginButton user={user} loading={loading} error={error} login={login} logout={logout} />
+        {error && (
+          <div className="text-center text-red-600 mb-2">
+            {error}
+            {error.includes('Network') && (
+              <button
+                className="ml-2 px-3 py-1 bg-blue-500 text-white rounded"
+                onClick={fetchUser}
+              >
+                Retry
+              </button>
+            )}
+            {error.includes('Session expired') && (
+              <button
+                className="ml-2 px-3 py-1 bg-blue-500 text-white rounded"
+                onClick={login}
+              >
+                Login
+              </button>
+            )}
+          </div>
+        )}
+        {loading ? (
+          <div className="text-center text-gray-600">Loading user info...</div>
+        ) : user ? (
           <>
             <FuelForm 
               onRecordAdded={loadRecords} 
