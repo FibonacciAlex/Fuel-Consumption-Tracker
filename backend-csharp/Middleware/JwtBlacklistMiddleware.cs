@@ -14,6 +14,9 @@ namespace FuelTracker.API.Middleware
 
         public async Task InvokeAsync(HttpContext context, JwtService jwtService)
         {
+
+        
+            
             var token = context.Request.Headers["Authorization"]
                 .FirstOrDefault()?.Replace("Bearer ", "");
 
@@ -27,4 +30,4 @@ namespace FuelTracker.API.Middleware
             await _next(context);
         }
     }
-} 
+}

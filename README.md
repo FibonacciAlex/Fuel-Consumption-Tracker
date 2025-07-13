@@ -3,7 +3,7 @@
 A modern React template for web applications and games, featuring React 18, Vite, TailwindCSS, and Material UI.
 You can see the demo here: https://skygroud.com/fuel-consumption-tracker/
 
-## Project Structure
+## Frontend Project Structure
 
 ```
 ├── src/
@@ -38,6 +38,27 @@ You can see the demo here: https://skygroud.com/fuel-consumption-tracker/
 - TailwindCSS
 - ESLint
 - Javascript
+
+## Google OAuth2 Workflow
+```
+User clicks "Login with Google" 
+    ↓
+Calls GET /auth/google
+    ↓
+GoogleLogin() method executes
+    ↓
+Redirects to Google OAuth page
+    ↓
+User logs in on Google
+    ↓
+Google redirects back to /auth/google/callback
+    ↓
+GoogleCallback() method processes the result
+    ↓
+Creates/updates user and generates JWT token
+    ↓
+Redirects to frontend with token
+```
 
 ## Run the Project in dev env
 ### Frontend

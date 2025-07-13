@@ -101,6 +101,21 @@ dotnet run
 3. Access Swagger documentation:
    - https://localhost:5001/swagger
 
+## OAuth Flow Process
+
+For this server, the workflow is a little bit difference:
+```
+Incoming Request: /auth/google/callback
+       ↓
+[CORS Middleware] → passes through
+       ↓
+[Authentication Middleware] → INTERCEPTS! 
+       ↓                      ↓
+[Your Controller]        [Processes Google callback]
+   (never reached)            ↓
+                         [Sends 302 redirect response]
+```
+The ASP.NET GoogleExtensions Middleware will handle the callback Request automatically and response 302, so we can not use the callback URL as the API endpoint, we need to watch the OnTicketReceived event and Process our own token generated logic.
 ## API Endpoints
 
 ### Authentication Endpoints

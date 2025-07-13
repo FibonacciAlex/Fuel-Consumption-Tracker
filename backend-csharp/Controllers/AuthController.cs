@@ -32,11 +32,13 @@ namespace FuelTracker.API.Controllers
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
-        [HttpGet("google/callback")]
+        // [HttpGet("google/callback")]
+        [HttpGet("google/success")]
         public async Task<IActionResult> GoogleCallback()
         {
+            Console.WriteLine("GoogleCallback hit!");
             var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-            
+
             if (!result.Succeeded)
             {
                 return BadRequest(new { error = "Google authentication failed" });
