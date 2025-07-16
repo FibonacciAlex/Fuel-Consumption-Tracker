@@ -27,53 +27,53 @@ namespace FuelTracker.API.Controllers
         {
             var properties = new AuthenticationProperties
             {
-                RedirectUri = Url.Action(nameof(GoogleCallback))
+                // RedirectUri = Url.Action(nameof(GoogleCallback))
             };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
         // [HttpGet("google/callback")]
-        [HttpGet("google/success")]
-        public async Task<IActionResult> GoogleCallback()
-        {
-            Console.WriteLine("GoogleCallback hit!");
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-
-            if (!result.Succeeded)
-            {
-                return BadRequest(new { error = "Google authentication failed" });
-            }
-
-            var claims = result.Principal?.Claims.ToList();
-            var googleId = claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            var name = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-            var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
-            if (string.IsNullOrEmpty(googleId) || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email))
-            {
-                return BadRequest(new { error = "Invalid user information from Google" });
-            }
-
-            // Check if user exists, create if not
-            var user = await _userService.GetUserByGoogleIdAsync(googleId);
-            if (user == null)
-            {
-                var userInfo = new GoogleUserInfo
-                {
-                    GoogleId = googleId,
-                    Name = name,
-                    Email = email
-                };
-                user = await _userService.CreateUserAsync(userInfo);
-            }
-
-            // Generate JWT token
-            var token = _jwtService.GenerateToken(user);
-
-            // Redirect to frontend with token
-            var frontendUrl = "http://localhost:5173"; // Update this with your frontend URL
-            return Redirect($"{frontendUrl}?token={token}");
-        }
+        // [HttpGet("google/success")]
+        // public async Task<IActionResult> GoogleCallback()
+        // {
+        //     Console.WriteLine("GoogleCallback hit!");
+        //     var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+        //
+        //     if (!result.Succeeded)
+        //     {
+        //         return BadRequest(new { error = "Google authentication failed" });
+        //     }
+        //
+        //     var claims = result.Principal?.Claims.ToList();
+        //     var googleId = claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        //     var name = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+        //     var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        //
+        //     if (string.IsNullOrEmpty(googleId) || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email))
+        //     {
+        //         return BadRequest(new { error = "Invalid user information from Google" });
+        //     }
+        //
+        //     // Check if user exists, create if not
+        //     var user = await _userService.GetUserByGoogleIdAsync(googleId);
+        //     if (user == null)
+        //     {
+        //         var userInfo = new GoogleUserInfo
+        //         {
+        //             GoogleId = googleId,
+        //             Name = name,
+        //             Email = email
+        //         };
+        //         user = await _userService.CreateUserAsync(userInfo);
+        //     }
+        //
+        //     // Generate JWT token
+        //     var token = _jwtService.GenerateToken(user);
+        //
+        //     // Redirect to frontend with token
+        //     var frontendUrl = "http://localhost:5173"; // Update this with your frontend URL
+        //     return Redirect($"{frontendUrl}?token={token}");
+        // }
 
         [HttpGet("user")]
         public async Task<IActionResult> GetCurrentUser()
@@ -117,10 +117,6 @@ namespace FuelTracker.API.Controllers
                 var response = new
                 {
                     message = "Logged out successfully",
-                    googleLogoutUrl = request?.LogoutFromGoogle == true 
-                        ? _googleAuthService.GetGoogleLogoutUrl(request?.RedirectUri)
-                        : null,
-                    requiresGoogleLogout = request?.LogoutFromGoogle == true
                 };
 
                 return Ok(response);
@@ -138,43 +134,10 @@ namespace FuelTracker.API.Controllers
             return Ok(new { logoutUrl });
         }
 
-        [HttpPost("logout/revoke")]
-        public async Task<IActionResult> RevokeGoogleToken([FromBody] RevokeTokenRequest request)
-        {
-            if (string.IsNullOrEmpty(request?.AccessToken))
-            {
-                return BadRequest(new { error = "Access token is required" });
-            }
-
-            try
-            {
-                var success = await _googleAuthService.RevokeGoogleTokenAsync(request.AccessToken);
-                
-                if (success)
-                {
-                    return Ok(new { message = "Google token revoked successfully" });
-                }
-                else
-                {
-                    return BadRequest(new { error = "Failed to revoke Google token" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "An error occurred while revoking the token", details = ex.Message });
-            }
-        }
     }
 
     public class LogoutRequest
     {
         public string? GoogleAccessToken { get; set; }
-        public bool? LogoutFromGoogle { get; set; }
-        public string? RedirectUri { get; set; }
-    }
-
-    public class RevokeTokenRequest
-    {
-        public string AccessToken { get; set; } = string.Empty;
     }
 } 

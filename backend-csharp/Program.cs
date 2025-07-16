@@ -91,21 +91,24 @@ builder.Services.AddAuthentication(options =>
     //     context.ReturnUri = "/auth/google/success";
 
     // };
+    
+    
     options.Events.OnTicketReceived = async context =>
     {
+        var frontendUrl = builder.Configuration.GetSection("Frontend:IndexUrl");
         try
         {
             var claims = context.Principal?.Claims.ToList();
             var googleId = claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             var gname = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
+    
             if (!string.IsNullOrEmpty(googleId) && !string.IsNullOrEmpty(email))
             {
                 // Get services from DI container
                 var userService = context.HttpContext.RequestServices.GetRequiredService<UserService>();
                 var jwtService = context.HttpContext.RequestServices.GetRequiredService<JwtService>();
-
+    
                 // Your user creation/retrieval logic
                 var user = await userService.GetUserByGoogleIdAsync(googleId);
                 if (user == null)
@@ -118,20 +121,19 @@ builder.Services.AddAuthentication(options =>
                     };
                     user = await userService.CreateUserAsync(userInfo);
                 }
-
+    
                 // Generate JWT token
                 var token = jwtService.GenerateToken(user);
-
+                
                 // Redirect to frontend with token
-                var frontendUrl = "http://localhost:5173";
-                context.ReturnUri = $"{frontendUrl}?token={token}";
+                context.ReturnUri = $"{frontendUrl.Value}?token={token}";
             }
         }
         catch (Exception ex)
         {
             // Handle errors
             Console.WriteLine($"Error in OnTicketReceived: {ex.Message}");
-            context.ReturnUri = "http://localhost:5173?error=auth_failed";
+            context.ReturnUri = $"{frontendUrl}?error=auth_failed";
         }
     };
 })
