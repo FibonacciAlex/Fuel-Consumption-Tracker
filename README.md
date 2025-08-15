@@ -1,6 +1,6 @@
 # React + Vite Template
 
-A modern React template for web applications and games, featuring React 18, Vite, TailwindCSS, and Material UI.
+A modern React template for web applications and games, featuring React 18, Vite, TailwindCSS, and Material UI. Providing two kinds of backend applications (nodejs and C#).
 You can see the demo here: https://skygroud.com/fuel-consumption-tracker/
 
 ## Frontend Project Structure
@@ -89,7 +89,7 @@ cd frontend
 npm install
 npm run build
 ```
-3. Install package for backend
+3. Install package for nodejs backend
 ```
 
 npm install express body-parser cors passport passport-google-oauth20 jsonwebtoken dotenv
