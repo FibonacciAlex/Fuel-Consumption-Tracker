@@ -89,7 +89,8 @@ cd frontend
 npm install
 npm run build
 ```
-3. Install package for nodejs backend
+After running the scripts above, you wil have a dist folder, the frontend side files were created in the folder and you can use them to deploy in any web server (like Nginx).
+3. Install package for nodejs backend. For C# backend, please check the readme file in csharp-backend folder.
 ```
 
 npm install express body-parser cors passport passport-google-oauth20 jsonwebtoken dotenv
