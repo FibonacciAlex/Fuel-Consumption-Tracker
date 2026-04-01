@@ -50,11 +50,16 @@ function Statistics({ records }) {
 
       totalDistance = maxOdometer - smallOdometer;
       
+      // The first record's fuel doesn't contribute to the distance driven in the tracking period.
+      // Assuming sortedRecords is sorted by date ascending.
+      let initialFuel = sortedRecords.length > 0 ? sortedRecords[0].amount : 0;
+      let initialPrice = sortedRecords.length > 0 ? sortedRecords[0].price : 0;
+      
       vehicleStats[plate].averageConsumption = totalDistance > 0 
-        ? (((totalFuel-curr.amount) / totalDistance) * 100).toFixed(2)
+        ? (((totalFuel - initialFuel) / totalDistance) * 100).toFixed(2)
         : null;
       vehicleStats[plate].averageCostPer100km = totalDistance > 0
-        ? (((totalCost-curr.price) / totalDistance) * 100).toFixed(2)
+        ? (((totalCost - initialPrice) / totalDistance) * 100).toFixed(2)
         : null;
       vehicleStats[plate].totalDistance = totalDistance;
       vehicleStats[plate].totalFuel = totalFuel;

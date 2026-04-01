@@ -31,15 +31,12 @@ function FuelList({ records, onRecordDeleted, onEditRecord }) {
           
           // Look for the next full tank record
           for (let j = i + 1; j < plateRecords.length; j++) {
-            totalAmount += plateRecords[i].amount;
-            totalPrice += plateRecords[i].price;
+            totalAmount += plateRecords[j].amount;
+            totalPrice += plateRecords[j].price;
             if (plateRecords[j].filled || j === (plateRecords.length - 1)) {
               nextFullIndex = j;
               break;
             }
-            
-            
-            
           }
           
           // Calculate consumption and cost per km if we found a next full tank
