@@ -83,7 +83,9 @@ app.get('/auth/google/callback',
     const token = jwtService.generateToken(req.user);
     
     // Redirect to frontend with token as query parameter
-    const redirectUrl = `${process.env.ALLOW_ORIGIN}/fuel-consumption-tracker/?token=${encodeURIComponent(token)}`;
+    // If FRONTEND_REDIRECT_URL is configured, use it (useful when ALLOW_ORIGIN differs from the actual base path)
+    const baseUrl = process.env.FRONTEND_REDIRECT_URL || process.env.ALLOW_ORIGIN;
+    const redirectUrl = `${baseUrl}?token=${encodeURIComponent(token)}`;
     console.log(`Google redirect is:${redirectUrl}`);
     res.redirect(redirectUrl);
   });
