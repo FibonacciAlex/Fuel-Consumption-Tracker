@@ -15,4 +15,4 @@ backend/.env
 backend-csharp/appsettings.json
 frontend/vite.config.js
 backend-csharp/.github/copilot-instructions.md
-backend/.env
+.DS_Store
