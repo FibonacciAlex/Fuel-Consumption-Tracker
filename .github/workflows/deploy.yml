@@ -35,6 +35,8 @@ jobs:
             ls -t $BACKUP_ROOT/backend_backup_*.tar.gz | tail -n +4 | xargs -r rm
             
             # 2. Update Backend
+            # Sync new code to running backend directory
+            cp -r /home/ubuntu/server/Fuel-Consumption-Tracker/backend/* /home/ubuntu/server/fuel-tracker/backend/
             cd $BACKEND_DIR
             git pull origin main
             npm install
