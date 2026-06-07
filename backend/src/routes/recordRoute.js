@@ -6,11 +6,15 @@ const {
   deleteFuelRecordById,
 } = require('../controllers/recordController');
 const { ensureAuthenticated } = require('../middleware/authMiddleware');
+const { ensureAutomationAuthorized } = require('../middleware/automationMiddleware');
 
 const router = express.Router();
 
 // Add a new fuel record
 router.post('/fuel-records', ensureAuthenticated, addFuelRecord);
+
+// Add a new fuel record (Automation)
+router.post('/fuel-records/automation', ensureAutomationAuthorized, addFuelRecord);
 
 // Fetch all fuel records
 router.get('/fuel-records', ensureAuthenticated, fetchFuelRecords);

@@ -1,0 +1,51 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Define Directories
+            BACKUP_ROOT="/home/ubuntu/server/fuel-tracker/backups"
+            BACKEND_DIR="/home/ubuntu/server/fuel-tracker/backend"
+            FRONTEND_BUILD_SRC="/home/ubuntu/server/frontend/fuel-tracker"
+            
+            mkdir -p $BACKUP_ROOT
+            
+            # 1. Backup Backend
+            TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+            tar -czvf $BACKUP_ROOT/backend_backup_$TIMESTAMP.tar.gz $BACKEND_DIR
+            
+            # Clean old backups (keep 3)
+            ls -t $BACKUP_ROOT/backend_backup_*.tar.gz | tail -n +4 | xargs -r rm
+            
+            # 2. Update Backend
+            cd $BACKEND_DIR
+            git pull origin main
+            npm install
+            # Restart PM2
+            export PATH=$PATH:/home/ubuntu/.nvm/versions/node/v22.16.0/bin
+            pm2 restart app
+            
+            # 3. Update Frontend
+            cd /home/ubuntu/server/Fuel-Consumption-Tracker/frontend
+            git pull origin main
+            npm install
+            npm run build
+            cp -r dist/* $FRONTEND_BUILD_SRC
+            echo "Deployment finished successfully."
